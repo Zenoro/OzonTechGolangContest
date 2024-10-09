@@ -16,18 +16,18 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 	"strconv"
 	"strings"
 )
+
+const MOD = 1_000_000_007
 
 func main() {
 	in := bufio.NewReader(os.Stdin)
 	out := bufio.NewWriter(os.Stdout)
 	defer out.Flush()
 
-	DIFER := int64(math.Pow10(9) + 7)
 	Tinput, _ := in.ReadString('\n')
 	t, err := strconv.Atoi(strings.TrimSpace(Tinput))
 	if err != nil {
@@ -43,13 +43,7 @@ func main() {
 		}
 		aArray := ReadArray(in, n)
 		bArray := ReadArray(in, n)
-		var res int64 = 1
-		for k := 0; k < n; k++ {
-			res *= CountKrat(aArray[k], bArray[k], k+1)
-			// res *= (bArray[k] - aArray[k] + 1) / (k + 1)
-		}
-		// fmt.Fprint(out, res%DIFER, "\n")
-		fmt.Fprint(out, res%DIFER, "\n")
+		fmt.Fprint(out, countArrays(n, aArray, bArray), "\n")
 	}
 }
 
@@ -65,12 +59,22 @@ func ReadArray(reader *bufio.Reader, length int) []int {
 	return numbers
 }
 
-func CountKrat(a int, b int, num int) int64 {
-	var ctr int64 = 0
-	for i := a; i <= b; i++ {
-		if i%num == 0 {
-			ctr++
+func countArrays(n int, l []int, r []int) int64 {
+	var totalCount int64 = 1
+
+	for i := 1; i <= n; i++ {
+		li := l[i-1]
+		ri := r[i-1]
+
+		start := (li + i - 1) / i * i
+		end := ri / i * i
+
+		if start > end {
+			return 0
 		}
+
+		count := (end-start)/i + 1
+		totalCount = (totalCount * int64(count)) % MOD
 	}
-	return ctr
+	return totalCount
 }
